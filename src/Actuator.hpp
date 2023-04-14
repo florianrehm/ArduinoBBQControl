@@ -34,7 +34,7 @@ typedef struct actuator_t
     actState = ACT_UNDEFINED;
     tick = 0;
     err = ERR_NULL;
-    servo.attach(SERVO_PIN);
+    servo.attach(ACT_SERVO_PIN);
 
     return 0;
   };

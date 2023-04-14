@@ -2,7 +2,7 @@
 #include "config.hpp"
 
 Display disp;
-LiquidCrystal lcd = LiquidCrystal(LCD_PIN_RS, LCD_PIN_EN, LCD_PIN_D4, LCD_PIN_D5, LCD_PIN_D6, LCD_PIN_D7);
+LiquidCrystal lcd = LiquidCrystal(DISP_LCD_PIN_RS, DISP_LCD_PIN_EN, DISP_LCD_PIN_D4, DISP_LCD_PIN_D5, DISP_LCD_PIN_D6, DISP_LCD_PIN_D7);
 
 
 const char *DispStrs[][4] = 

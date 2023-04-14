@@ -68,7 +68,7 @@ ErrorType ActUpdate()
     if(act.pos != newPos)
     {
       act.servo.write(newPos);
-      delay(SERVO_WAIT_MS);
+      delay(ACT_SERVO_WAIT_MS);
       act.pos = newPos;
     }
 
@@ -91,7 +91,7 @@ ErrorType ActUpdate()
     if(pos != act.pos)
     {
       act.servo.write(pos);
-      delay(SERVO_WAIT_MS);
+      delay(ACT_SERVO_WAIT_MS);
       act.pos = pos;
     }
 
