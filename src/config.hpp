@@ -1,0 +1,30 @@
+#define TMP_UPDATE_RATE_MS 20
+#define ACT_UPDATE_RATE_MS 50
+
+#define ACT_STEP 5
+#define SERVO_PIN 10
+#define SERVO_WAIT_MS 25
+
+#define CTRL_LIDOPEN_WAIT_SEC 60
+#define CTRL_LIDOPEN_HISTORY_LEN 30
+#define CTRL_LIDOPEN_TEMP_THRESHOLD 25
+
+#define CTRL_GAS_LOW_GRADIENT -0.8f
+
+#define CTRL_TEMP_HISTORY_LEN 180
+
+#define TEMP_SIMULATION 1
+
+#define CONF_WHEEL_PIN 14
+#define CONF_BUTTON 6
+
+#define DISP_UPDATE_RATE 20
+#define DISP_LCD_ROWS 2
+#define DISP_LCD_COLS 20
+
+#define LCD_PIN_RS 12
+#define LCD_PIN_EN 11
+#define LCD_PIN_D4 5
+#define LCD_PIN_D5 4
+#define LCD_PIN_D6 3
+#define LCD_PIN_D7 2
