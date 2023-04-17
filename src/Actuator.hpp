@@ -29,7 +29,7 @@ typedef struct actuator_t
   int init()
   {
     pos = 0;
-    maxPos = 175;
+    maxPos = 90;
     minPos = 0;
     actState = ACT_UNDEFINED;
     tick = 0;

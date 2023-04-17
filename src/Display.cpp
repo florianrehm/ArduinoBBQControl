@@ -7,16 +7,16 @@ LiquidCrystal lcd = LiquidCrystal(DISP_LCD_PIN_RS, DISP_LCD_PIN_EN, DISP_LCD_PIN
 
 const char *DispStrs[][4] = 
 {
-  {"Initialize", "", "", "Please wait"},
-  {"Calibration", "", "", "Please wait"},
-  {"Configuration", "OK?", "Select Temp: C", ""},
-  {"Heatup", "", "Chamber: C", "Please wait"},
-  {"Lid Open", "Timer: ", "Chamber: C", "Target: C"},
-  {"Error", "Gas Low", "Chamber: C", "Target: C"},
+  {"Init", "", "", "Wait"},
+  {"Calib", "", "", "Wait"},
+  {"Config", "OK?", "Sel. Temp:", ""},
+  {"Heatup", "", "Act: ", "Wait"},
+  {"Lid Open", "T: ", "Act:", "Tgt:"},
+  {"Error", "Gas Low", "Act:", "Tgt:"},
   {"Pause", "Continue?", "", ""},
   {"Error", "Retry?", "", ""},
   {"Finished", "Resume?", "", ""},
-  {"Operation", "", "Chamber: C", "Target: C"},
+  {"Operation", "", "Act:", "Tgt:"},
 };
 
 
@@ -27,8 +27,8 @@ const dispDataTypes DispVals[][4] =
   {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_NONE},
   {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_SEL_TEMP, DISP_TYPE_NONE},
   {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_CHAMB_TEMP, DISP_TYPE_NONE},
-  {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_CHAMB_TEMP, DISP_TYPE_TARGET_TEMP},
-  {DISP_TYPE_NONE, DISP_TYPE_TIMER, DISP_TYPE_NONE, DISP_TYPE_NONE},
+  {DISP_TYPE_NONE, DISP_TYPE_TIMER, DISP_TYPE_CHAMB_TEMP, DISP_TYPE_TARGET_TEMP},
+  {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_NONE},
   {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_CHAMB_TEMP, DISP_TYPE_TARGET_TEMP},
   {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_NONE},
   {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_NONE},
@@ -56,7 +56,7 @@ void DispUpdate()
 
   if(disp.tick == 0)
   {
-    for(int i = 0; i < sizeof(4); i++)
+    for(int i = 0; i < 4; i++)
     {
       disp.sqStrs[i] = DispStrs[(int)disp.dispMode][i];
       
@@ -98,9 +98,9 @@ void DispPrintCurrState()
     for(int i = 0; i < 2; i++)
     {
       lcd.print(disp.sqStrs[i]);
-      lcd.print(" ");
+      //lcd.print(" ");
 
-      if(disp.sqVals[i] != -1)
+      if(disp.sqVals[i] != -1 && disp.sqVals[i] != 0)
       {
         lcd.print(disp.sqVals[i]);
       }
@@ -113,16 +113,15 @@ void DispPrintCurrState()
     for(int i = 2; i < 4; i++)
     {
       lcd.print(disp.sqStrs[i]);
-      lcd.print(" ");
+      //lcd.print(" ");
 
-      if(disp.sqVals[i] != -1)
+      if(disp.sqVals[i] != -1 && disp.sqVals[i] != 0)
       {
         lcd.print(disp.sqVals[i]);
       }
 
       lcd.print(" ");
     }
-
 }
 
 void DispSetCurrState(CtrlMode mode, int targetTemp, ErrorType err, int chambTemp, int lidTimer)
@@ -131,5 +130,5 @@ void DispSetCurrState(CtrlMode mode, int targetTemp, ErrorType err, int chambTem
   disp.targetTemp = targetTemp;
   disp.err = err;
   disp.chambTemp = chambTemp;
-  lidTimer = lidTimer;
+  disp.lidTimer = lidTimer;
 }

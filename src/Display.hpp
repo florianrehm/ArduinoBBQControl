@@ -37,9 +37,6 @@ typedef struct Display_t
     chambTemp = 0;
     lidTimer = 0;
     tick = 0;
-
-    memset(sqStrs, NULL, sizeof(sqStrs));
-    memset(&sqVals, 0, sizeof(sqVals));
   }
 
 } Display;

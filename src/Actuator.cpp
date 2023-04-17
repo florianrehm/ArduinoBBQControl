@@ -11,7 +11,7 @@ int ActInit()
 
 ErrorType ActUpdate()
 {
-  act.tick = (act.tick + 1) % ACT_UPDATE_RATE_MS;
+  act.tick = (act.tick + 1) % ACT_UPDATE_RATE;
 
   if(act.tick == 0)
   {

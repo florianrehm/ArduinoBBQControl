@@ -67,15 +67,16 @@ ErrorType CtrlUpdate()
     break;
   }
 
-  DispSetCurrState(ctrl.currMode, ctrl.targetChamberTemp, err, TmpGetAvgTemperature(), ctrl.lidTimer);
-  
-  DispUpdate();
-  
   updateTempHistory();
+
+  DispSetCurrState(ctrl.currMode, ctrl.targetChamberTemp, err, TmpGetAvgTemperature(), ctrl.lidTimer);
+  DispUpdate();
 
   if(err != ERR_NULL)
   {
     ctrl.updateMode(MODE_ERROR);
+    Serial.print("Error");
+    Serial.print(err);
   }
 
   return err;
@@ -90,10 +91,13 @@ ErrorType CtrlModeConfig()
   switch(ctrl.configMode)
   {
     case CONF_UNINITIALIZED:
+    {
       ctrl.configMode = CONF_TEMP;
+    }
     break;
 
     case CONF_TEMP:
+    {
       int val = analogRead(CONF_WHEEL_PIN);
       val = map(val, 0, 1023, 80, 150);
 
@@ -103,7 +107,13 @@ ErrorType CtrlModeConfig()
       {
         ctrl.configMode = CONF_DONE;
       }
+    }
+    break;
 
+    case CONF_DONE:
+    {
+      ctrl.updateMode(MODE_HEATUP);
+    }
     break;
 
     case CONF_TIME:
@@ -112,13 +122,12 @@ ErrorType CtrlModeConfig()
     case CONF_MEAT_TEMP:
     break;
 
-    case CONF_DONE:
-      ctrl.updateMode(MODE_HEATUP);
+    default:
     break;
 
   }
 
-  if(ctrl.targetChamberTemp < 20 || ctrl.targetChamberTemp > 300)
+  if(ctrl.configMode == CONF_DONE && (ctrl.targetChamberTemp < 20 || ctrl.targetChamberTemp > 300))
   {
     err = ERR_CONFIG;
   }
@@ -184,14 +193,14 @@ ErrorType CtrlModeLidOpen()
   if(ctrl.lidTimerMode == TIMER_IDLE)
   {
     ctrl.lidOpen = true;
-    ctrl.lidTimer = millis() / 1000.0f;
+    ctrl.lidTimer = 0;
     ctrl.lidTimerInit = millis() / 1000.0f;
     ctrl.lidTimerMode = TIMER_RUN;
     ActSetState(ACT_HOLD);
   }
-  else if(ctrl.lidTimerMode == TIMER_RUN && ctrl.lidTimer < ctrl.lidTimerInit + CTRL_LIDOPEN_WAIT_SEC)
+  else if(ctrl.lidTimerMode == TIMER_RUN && ctrl.lidTimer < CTRL_LIDOPEN_WAIT_SEC)
   {
-    ctrl.lidTimer = millis() / 1000.0f;
+    ctrl.lidTimer = (millis() / 1000.0f) - ctrl.lidTimerInit;
     ActSetState(ACT_HOLD);
   }
   else  //timer expired
@@ -226,27 +235,30 @@ ErrorType CtrlModeError()
 
 void updateTempHistory()
 {
-  //start countdown and re-start control mode operation
   if(ctrl.tempTimerMode == TIMER_IDLE)
   {
-    ctrl.tempTimer = millis() / 1000.0f;
+    ctrl.tempTimer = 0;
     ctrl.tempTimerInit = millis() / 1000.0f;
     ctrl.tempTimerMode = TIMER_RUN;
-    ctrl.tempHistoryCount = 0;
-    ctrl.tempHistory[ctrl.tempHistoryCount] = TmpGetAvgTemperature();
   }
-  else if(ctrl.tempTimerMode == TIMER_RUN && ctrl.tempTimer < ctrl.tempTimerInit + CTRL_TEMP_HISTORY_LEN && ctrl.tempHistoryCount < CTRL_TEMP_HISTORY_LEN)
+  else if(ctrl.tempTimerMode == TIMER_RUN && ctrl.tempTimer <  CTRL_TEMP_HISTORY_TIMER)
   {
-    ctrl.tempHistoryCount += 1;
-    ctrl.tempTimer = millis() / 1000.0f;
-    ctrl.tempHistory[ctrl.tempHistoryCount] = TmpGetAvgTemperature();
+    ctrl.tempTimer = (millis() / 1000.0f) - ctrl.tempTimerInit;
   }
   else  //timer expired
   {
-    ctrl.tempTimer = 0;
-    ctrl.tempTimerInit = 0;
+    ctrl.tempHistory[ctrl.tempHistoryCount] = TmpGetAvgTemperature();
+    ctrl.tempHistoryCount += 1;
+
+    if(ctrl.tempHistoryCount == CTRL_TEMP_HISTORY_LEN)
+    {
+      ctrl.tempHistoryCount = 0;
+      ctrl.tempHistoryBufOverflow = true;
+    }
+
     ctrl.tempTimerMode = TIMER_IDLE;
   }
+
 }
 
 void CtrlSetTargetTemp(int temp)
@@ -256,19 +268,24 @@ void CtrlSetTargetTemp(int temp)
 
 bool CtrlDetectOpenLid()
 {
-  if(CTRL_LIDOPEN_HISTORY_LEN > CTRL_TEMP_HISTORY_LEN)
-  {
-    ctrl.updateMode(MODE_ERROR);
-    return false;
-  }
-
   bool lidOpen = false;
-  int startPos = ctrl.tempHistoryCount;
-  int endPos = abs(startPos - CTRL_LIDOPEN_HISTORY_LEN) % CTRL_TEMP_HISTORY_LEN;
 
-  if(ctrl.tempHistory[startPos] - ctrl.tempHistory[endPos] <= CTRL_LIDOPEN_TEMP_THRESHOLD)
+  if(CtrlGetMode() == MODE_OPERATION && ctrl.tempHistoryBufOverflow == true)
   {
-    lidOpen = true;
+    
+    if(CTRL_LIDOPEN_HISTORY_LEN > CTRL_TEMP_HISTORY_LEN)
+    {
+      ctrl.updateMode(MODE_ERROR);
+      return false;
+    }
+    
+    int startPos = ctrl.tempHistoryCount;
+    int endPos = abs(startPos - CTRL_LIDOPEN_HISTORY_LEN) % CTRL_TEMP_HISTORY_LEN;
+
+    if(ctrl.tempHistory[startPos] - ctrl.tempHistory[endPos] >= CTRL_LIDOPEN_TEMP_THRESHOLD)
+    {
+      lidOpen = true;
+    }
   }
 
   return lidOpen;
@@ -278,14 +295,17 @@ bool CtrlDetectGasLow()
 {
   bool gasLow = false;
 
-  int startPos = ctrl.tempHistoryCount;
-  int endPos = abs(startPos - CTRL_TEMP_HISTORY_LEN) % CTRL_TEMP_HISTORY_LEN;
-
-  if( ( ((ctrl.tempHistory[startPos] - ctrl.tempHistory[endPos]) / CTRL_TEMP_HISTORY_LEN) <= CTRL_GAS_LOW_GRADIENT) 
-      && ActGetState() == ACT_MAXIMUM
-      && TmpGetAvgTemperature() < ctrl.targetChamberTemp)
+  if(CtrlGetMode() == MODE_OPERATION && ctrl.tempHistoryBufOverflow == true)
   {
-    gasLow = true;
+    int startPos = ctrl.tempHistoryCount;
+    int endPos = abs(startPos - CTRL_TEMP_HISTORY_LEN) % CTRL_TEMP_HISTORY_LEN;
+
+    if( ( ((ctrl.tempHistory[startPos] - ctrl.tempHistory[endPos]) / CTRL_TEMP_HISTORY_LEN) <= CTRL_GAS_LOW_GRADIENT) 
+        && ActGetState() == ACT_MAXIMUM
+        && TmpGetAvgTemperature() < ctrl.targetChamberTemp)
+    {
+      gasLow = true;
+    }
   }
 
   return gasLow;

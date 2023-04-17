@@ -23,11 +23,11 @@ enum CtrlMode
 
 enum ConfigModeType
 {
-  CONF_TEMP,
-  CONF_TIME,
-  CONF_MEAT_TEMP,
-  CONF_DONE,
-  CONF_UNINITIALIZED,
+  CONF_TEMP = 0,
+  CONF_TIME = 1,
+  CONF_MEAT_TEMP = 2,
+  CONF_DONE = 3,
+  CONF_UNINITIALIZED = 4,
 };
 
 enum TimerMode
@@ -57,6 +57,7 @@ typedef struct Control_t
   TimerMode tempTimerMode;
   int tempHistory[CTRL_TEMP_HISTORY_LEN];
   int tempHistoryCount;
+  bool tempHistoryBufOverflow;
 
   int init()
   {
@@ -76,7 +77,12 @@ typedef struct Control_t
     tempTimerInit = 0;
     tempTimerMode = TIMER_IDLE;
     tempHistoryCount = 0;
-    memset(&tempHistory, 0, sizeof(tempHistory));
+    tempHistoryBufOverflow = false;
+
+    for(int i = 0; i < CTRL_TEMP_HISTORY_LEN; i++)
+    {
+      tempHistory[i] = 0;
+    }
 
     return 0;
   }
