@@ -14,9 +14,20 @@ float TmpGetTemperature()
   int tempSensorVal = analogRead(TEMP_SIMULATION_PIN);
   float temperature = map(tempSensorVal, 0, 1023, 80, 150);
 #else
-  int tempSensorVal = analogRead(temp.pinInput);
-  float voltage = (tempSensorVal / 1024.0f) * 5.0f;
-  float temperature = (voltage - 0.5f) * 100;
+  float tempSensorVal = analogRead(TEMP_SENSOR_PIN);
+
+  tempSensorVal = map(tempSensorVal, 0, 1023, 0, 4096);
+
+  float Rt = 50 * ((4096.0/tempSensorVal) - 1);
+
+  float v = log(Rt/220.0f);
+
+  float a = 0.00334519;
+  float b = 0.000243825;
+  float c = 0.00000261726;
+
+  float temperature = (1/(a + b*v + c*v*v)) - 273;
+  
 #endif
 
   return temperature;

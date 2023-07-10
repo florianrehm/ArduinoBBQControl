@@ -9,6 +9,8 @@ const char *DispStrs[][4] =
 {
   {"Init", "", "", "Wait"},
   {"Calib", "", "", "Wait"},
+  {"Config", "OK?", "Sel. Min:" , ""},
+  {"Config", "OK?", "Sel. Max:" , ""},
   {"Config", "OK?", "Sel. Temp:", ""},
   {"Heatup", "", "Act: ", "Wait"},
   {"Lid Open", "T: ", "Act:", "Tgt:"},
@@ -23,8 +25,10 @@ const char *DispStrs[][4] =
 
 const dispDataTypes DispVals[][4] = 
 {
-  {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_SEL_TEMP, DISP_TYPE_NONE},
   {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_NONE},
+  {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_NONE},
+  {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_SEL_ACT_MIN, DISP_TYPE_NONE},
+  {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_SEL_ACT_MAX, DISP_TYPE_NONE},
   {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_SEL_TEMP, DISP_TYPE_NONE},
   {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_CHAMB_TEMP, DISP_TYPE_NONE},
   {DISP_TYPE_NONE, DISP_TYPE_TIMER, DISP_TYPE_CHAMB_TEMP, DISP_TYPE_TARGET_TEMP},
@@ -81,6 +85,14 @@ void DispUpdate()
         case DISP_TYPE_TIMER:
         disp.sqVals[i] = disp.lidTimer;
         break;
+
+        case DISP_TYPE_SEL_ACT_MIN:
+        disp.sqVals[i] = disp.actPos;
+        break;
+        
+        case DISP_TYPE_SEL_ACT_MAX:
+        disp.sqVals[i] = disp.actPos;
+        break;
       }
 
     }
@@ -124,11 +136,12 @@ void DispPrintCurrState()
     }
 }
 
-void DispSetCurrState(CtrlMode mode, int targetTemp, ErrorType err, int chambTemp, int lidTimer)
+void DispSetCurrState(CtrlMode mode, int actPos, int targetTemp, ErrorType err, int chambTemp, int lidTimer)
 {
   disp.dispMode = mode;
   disp.targetTemp = targetTemp;
   disp.err = err;
   disp.chambTemp = chambTemp;
   disp.lidTimer = lidTimer;
+  disp.actPos = actPos;
 }

@@ -10,22 +10,24 @@ enum CtrlMode
 {
   MODE_INITIALIZE   = 0,
   MODE_CALIBRATION  = 1,
-  MODE_CONFIG       = 2,
-  MODE_HEATUP       = 3,
-  MODE_LID_OPEN     = 4,
-  MODE_GAS_LOW      = 5,
-  MODE_PAUSE        = 6,
-  MODE_ERROR        = 7,
-  MODE_FINISHED     = 8,
-  MODE_OPERATION    = 9,
+  MODE_CONFIG_ACT_MIN = 2,
+  MODE_CONFIG_ACT_MAX = 3,
+  MODE_CONFIG_TEMP    = 4,
+  MODE_HEATUP       = 5,
+  MODE_LID_OPEN     = 6,
+  MODE_GAS_LOW      = 7,
+  MODE_PAUSE        = 8,
+  MODE_ERROR        = 9,
+  MODE_FINISHED     = 10,
+  MODE_OPERATION    = 11,
   MODE_UNDEFINED,
 };
 
 enum ConfigModeType
 {
   CONF_TEMP = 0,
-  CONF_TIME = 1,
-  CONF_MEAT_TEMP = 2,
+  CONF_ACT_MIN = 1,
+  CONF_ACT_MAX = 2,
   CONF_DONE = 3,
   CONF_UNINITIALIZED = 4,
 };
@@ -102,7 +104,9 @@ ErrorType CtrlUpdate();
 int CtrlInit();
 CtrlMode CtrlGetMode();
 
-ErrorType CtrlModeConfig();
+ErrorType CtrlModeConfigTemp();
+ErrorType CtrlModeConfigActMin();
+ErrorType CtrlModeConfigActMax();
 ErrorType CtrlModePause();
 ErrorType CtrlModeHeatup();
 ErrorType CtrlModeLidOpen();

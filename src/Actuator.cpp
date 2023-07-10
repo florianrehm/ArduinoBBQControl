@@ -68,7 +68,7 @@ ErrorType ActUpdate()
     if(act.pos != newPos)
     {
       act.servo.write(newPos);
-      delay(ACT_SERVO_WAIT_MS);
+      //delay(ACT_SERVO_WAIT_MS);
       act.pos = newPos;
     }
 
@@ -87,11 +87,11 @@ ErrorType ActUpdate()
       pos = act.minPos;
       ActSetState(ACT_MINIMUM);
     }
-
+    
     if(pos != act.pos)
     {
       act.servo.write(pos);
-      delay(ACT_SERVO_WAIT_MS);
+      //delay(ACT_SERVO_WAIT_MS);
       act.pos = pos;
     }
 
@@ -121,3 +121,28 @@ ErrorType ActUpdate()
   {
     return act.actState;
   }
+  void ActSetMinPos(int pos)
+  {
+    act.minPos = pos;
+  }
+
+void ActSetMaxPos(int pos)
+{
+  act.maxPos = pos;
+}
+
+int ActGetCurrPos()
+{
+  return act.pos;
+}
+
+int ActGetMaxPos()
+{
+  return act.maxPos;
+}
+
+int ActGetMinPos()
+{
+  return act.minPos;
+}
+

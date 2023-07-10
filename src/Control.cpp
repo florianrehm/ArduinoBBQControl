@@ -23,16 +23,24 @@ ErrorType CtrlUpdate()
       ActInit();
       DispInit();
       BtnInit();
-      ctrl.updateMode(MODE_CALIBRATION);
+      ctrl.updateMode(MODE_CONFIG_ACT_MIN);
     break;
     
     case  MODE_CALIBRATION: //Actuator calibration, TempSensor calibration
       err = ActCalibration();
-      ctrl.updateMode(MODE_CONFIG);
+      ctrl.updateMode(MODE_HEATUP);
     break;
 
-    case MODE_CONFIG: //set target temperature, timer
-    err = CtrlModeConfig();
+    case MODE_CONFIG_ACT_MIN: //set target temperature, timer
+    err = CtrlModeConfigActMin();
+    break;
+
+    case MODE_CONFIG_ACT_MAX:
+    err = CtrlModeConfigActMax();
+    break;
+
+    case MODE_CONFIG_TEMP:
+    err = CtrlModeConfigTemp();
     break;
 
     case MODE_HEATUP:
@@ -69,7 +77,7 @@ ErrorType CtrlUpdate()
 
   updateTempHistory();
 
-  DispSetCurrState(ctrl.currMode, ctrl.targetChamberTemp, err, TmpGetAvgTemperature(), ctrl.lidTimer);
+  DispSetCurrState(ctrl.currMode, ActGetCurrPos(), ctrl.targetChamberTemp, err, TmpGetAvgTemperature(), ctrl.lidTimer);
   DispUpdate();
 
   if(err != ERR_NULL)
@@ -82,52 +90,72 @@ ErrorType CtrlUpdate()
   return err;
 }
 
-ErrorType CtrlModeConfig()
+ErrorType CtrlModeConfigTemp()
 {
   ErrorType err = ERR_NULL;
 
-  ActSetState(ACT_MINIMUM);
+  int val = 0;
 
-  switch(ctrl.configMode)
-  {
-    case CONF_UNINITIALIZED:
-    {
-      ctrl.configMode = CONF_TEMP;
-    }
-    break;
+  val = analogRead(CONF_WHEEL_PIN);
+  val = map(val, 0, 1023, 80, 150);
 
-    case CONF_TEMP:
-    {
-      int val = analogRead(CONF_WHEEL_PIN);
-      val = map(val, 0, 1023, 80, 150);
-
-      CtrlSetTargetTemp(val);
+  CtrlSetTargetTemp(val);
 
       if(BtnPressed() == true)
       {
-        ctrl.configMode = CONF_DONE;
+        ctrl.updateMode(MODE_CALIBRATION);
       }
-    }
-    break;
-
-    case CONF_DONE:
-    {
-      ctrl.updateMode(MODE_HEATUP);
-    }
-    break;
-
-    case CONF_TIME:
-    break;
-
-    case CONF_MEAT_TEMP:
-    break;
-
-    default:
-    break;
-
+    
+  if(ctrl.targetChamberTemp < 80 || ctrl.targetChamberTemp > 180)
+  {
+    err = ERR_CONFIG;
   }
 
-  if(ctrl.configMode == CONF_DONE && (ctrl.targetChamberTemp < 20 || ctrl.targetChamberTemp > 300))
+  return err;
+}
+
+ErrorType CtrlModeConfigActMin()
+{
+  ErrorType err = ERR_NULL;
+
+  int val = 0;
+  val = analogRead(CONF_WHEEL_PIN);
+  val = map(val, 0, 1023, 0, 180);
+
+  ActSetMotorPos(val);
+
+      if(BtnPressed() == true)
+      {
+        ActSetMinPos(val);
+        ctrl.updateMode(MODE_CONFIG_ACT_MAX);
+      }
+
+  if(ActGetMinPos() < 0 || ActGetMinPos() > 180)
+  {
+    err = ERR_CONFIG;
+  }
+
+  return err;
+}
+
+ErrorType CtrlModeConfigActMax()
+{
+  ErrorType err = ERR_NULL;
+
+  int val = 0;
+
+      val = analogRead(CONF_WHEEL_PIN);
+      val = map(val, 0, 1023, 0, 180);
+
+      ActSetMotorPos(val);
+
+      if(BtnPressed() == true)
+      {
+        ActSetMaxPos(val);
+        ctrl.updateMode(MODE_CONFIG_TEMP);
+      }
+
+  if(ActGetMaxPos() < 0 || ActGetMaxPos() > 180)
   {
     err = ERR_CONFIG;
   }
@@ -295,14 +323,19 @@ bool CtrlDetectGasLow()
 {
   bool gasLow = false;
 
-  if(CtrlGetMode() == MODE_OPERATION && ctrl.tempHistoryBufOverflow == true)
+   if(CtrlGetMode() == MODE_OPERATION && ctrl.tempHistoryBufOverflow == true)
   {
+    
+    if(CTRL_GASLOW_HISTORY_LEN > CTRL_TEMP_HISTORY_LEN)
+    {
+      ctrl.updateMode(MODE_ERROR);
+      return false;
+    }
+    
     int startPos = ctrl.tempHistoryCount;
-    int endPos = abs(startPos - CTRL_TEMP_HISTORY_LEN) % CTRL_TEMP_HISTORY_LEN;
+    int endPos = abs(startPos - CTRL_GASLOW_HISTORY_LEN) % CTRL_TEMP_HISTORY_LEN;
 
-    if( ( ((ctrl.tempHistory[startPos] - ctrl.tempHistory[endPos]) / CTRL_TEMP_HISTORY_LEN) <= CTRL_GAS_LOW_GRADIENT) 
-        && ActGetState() == ACT_MAXIMUM
-        && TmpGetAvgTemperature() < ctrl.targetChamberTemp)
+    if(ctrl.tempHistory[startPos] - ctrl.tempHistory[endPos] >= CTRL_GASLOW_TEMP_THRESHOLD && ActGetState() == ACT_MAXIMUM)
     {
       gasLow = true;
     }

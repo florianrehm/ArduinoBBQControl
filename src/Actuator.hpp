@@ -29,7 +29,7 @@ typedef struct actuator_t
   int init()
   {
     pos = 0;
-    maxPos = 90;
+    maxPos = 180;
     minPos = 0;
     actState = ACT_UNDEFINED;
     tick = 0;
@@ -48,6 +48,12 @@ ErrorType ActMoveMotorStep(int step);
 ErrorType ActCalibration();
 void ActSetState(ActCtrlState state);
 ActCtrlState ActGetState();
+void ActSetMinPos(int pos);
+void ActSetMaxPos(int pos);
+
+int ActGetCurrPos();
+int ActGetMinPos();
+int ActGetMaxPos();
 
 
 

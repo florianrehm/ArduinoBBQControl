@@ -25,6 +25,7 @@ typedef struct Display_t
   int chambTemp;
   int lidTimer;
   int tick;
+  int actPos;
 
   char* sqStrs[4];
   int sqVals[4];
@@ -37,6 +38,7 @@ typedef struct Display_t
     chambTemp = 0;
     lidTimer = 0;
     tick = 0;
+    actPos = 0;
   }
 
 } Display;
@@ -44,6 +46,6 @@ typedef struct Display_t
 int DispInit();
 void DispPrintCurrState();
 void DispUpdate();
-void DispSetCurrState(CtrlMode mode, int targetTemp, ErrorType err, int chambTemp, int lidTimer);
+void DispSetCurrState(CtrlMode mode, int actPos, int targetTemp, ErrorType err, int chambTemp, int lidTimer);
 
 #endif
