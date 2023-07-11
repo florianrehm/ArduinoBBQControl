@@ -26,7 +26,7 @@ ErrorType CtrlUpdate()
       ctrl.updateMode(MODE_CONFIG_ACT_MIN);
     break;
     
-    case  MODE_CALIBRATION: //Actuator calibration, TempSensor calibration
+    case  MODE_CALIBRATION: //Actuator go from min to max
       err = ActCalibration();
       ctrl.updateMode(MODE_HEATUP);
     break;
@@ -325,7 +325,6 @@ bool CtrlDetectGasLow()
 
    if(CtrlGetMode() == MODE_OPERATION && ctrl.tempHistoryBufOverflow == true)
   {
-    
     if(CTRL_GASLOW_HISTORY_LEN > CTRL_TEMP_HISTORY_LEN)
     {
       ctrl.updateMode(MODE_ERROR);

@@ -4,7 +4,24 @@
 Display disp;
 LiquidCrystal lcd = LiquidCrystal(DISP_LCD_PIN_RS, DISP_LCD_PIN_EN, DISP_LCD_PIN_D4, DISP_LCD_PIN_D5, DISP_LCD_PIN_D6, DISP_LCD_PIN_D7);
 
+#ifdef ACT_INVERT_SERVO
+const char *DispStrs[][4] = 
+{
+  {"Init", "", "", "Wait"},
+  {"Calib", "", "", "Wait"},
+  {"Config", "OK?", "Sel. Max:" , ""},
+  {"Config", "OK?", "Sel. Min:" , ""},
+  {"Config", "OK?", "Sel. Temp:", ""},
+  {"Heatup", "", "Act: ", "Wait"},
+  {"Lid Open", "T: ", "Act:", "Tgt:"},
+  {"Error", "Gas Low", "Act:", "Tgt:"},
+  {"Pause", "Continue?", "", ""},
+  {"Error", "Retry?", "", ""},
+  {"Finished", "Resume?", "", ""},
+  {"Operation", "", "Act:", "Tgt:"},
+};
 
+#else
 const char *DispStrs[][4] = 
 {
   {"Init", "", "", "Wait"},
@@ -20,6 +37,8 @@ const char *DispStrs[][4] =
   {"Finished", "Resume?", "", ""},
   {"Operation", "", "Act:", "Tgt:"},
 };
+
+#endif
 
 
 

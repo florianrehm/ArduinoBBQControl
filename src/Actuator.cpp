@@ -52,7 +52,8 @@ ErrorType ActUpdate()
 
   ErrorType ActMoveMotorStep(int step)
   {
-    int newPos = act.pos + step;
+
+  int newPos = act.pos + step;
 
     if(newPos >= act.maxPos)
     {
@@ -65,12 +66,20 @@ ErrorType ActUpdate()
       ActSetState(ACT_MINIMUM);
     }
 
+  #ifdef ACT_INVERT_SERVO
+    if(act.pos != newPos)
+    {
+      act.servo.write(abs(act.minPos - newPos));
+      act.pos = newPos;
+    }
+  #else
+
     if(act.pos != newPos)
     {
       act.servo.write(newPos);
-      //delay(ACT_SERVO_WAIT_MS);
       act.pos = newPos;
     }
+  #endif
 
     return ERR_NULL;
   }
@@ -88,12 +97,19 @@ ErrorType ActUpdate()
       ActSetState(ACT_MINIMUM);
     }
     
+  #ifdef ACT_INVERT_SERVO
     if(pos != act.pos)
     {
       act.servo.write(pos);
-      //delay(ACT_SERVO_WAIT_MS);
       act.pos = pos;
     }
+  #else
+    if(pos != act.pos)
+    {
+      act.servo.write(abs(act.minPos - pos));
+      act.pos = pos;
+    }
+  #endif
 
     return ERR_NULL;
   }
@@ -104,9 +120,11 @@ ErrorType ActUpdate()
     for(int pos = act.minPos; pos <= act.maxPos; pos++)
     {
       ActSetMotorPos(pos);
+      delay(ACT_SERVO_WAIT_MS);
     }
 
     ActSetMotorPos(act.minPos);
+    delay(ACT_SERVO_WAIT_MS);
 
     return ERR_NULL;
 
