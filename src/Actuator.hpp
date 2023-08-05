@@ -2,8 +2,6 @@
 #include <Servo.h>
 #include "config.hpp"
 
-
-
 enum ActCtrlState
 {
     ACT_INCREASE,

@@ -53,7 +53,7 @@ ErrorType ActUpdate()
   ErrorType ActMoveMotorStep(int step)
   {
 
-  int newPos = act.pos + step;
+    int newPos = act.pos + step;
 
     if(newPos >= act.maxPos)
     {
@@ -66,57 +66,72 @@ ErrorType ActUpdate()
       ActSetState(ACT_MINIMUM);
     }
 
-  #ifdef ACT_INVERT_SERVO
-    if(act.pos != newPos)
+    if(ACT_INVERT_SERVO == 0)
     {
-      act.servo.write(abs(act.minPos - newPos));
-      act.pos = newPos;
+      if(act.pos != newPos)
+      {
+        act.servo.write(newPos);
+        act.pos = newPos;
+      }
     }
-  #else
-
-    if(act.pos != newPos)
+    else
     {
-      act.servo.write(newPos);
-      act.pos = newPos;
+      if(act.pos != newPos)
+      {
+        act.servo.write(act.maxPos - newPos);
+        act.pos = newPos;
+      }
     }
-  #endif
 
     return ERR_NULL;
   }
 
   ErrorType ActSetMotorPos(int pos)
   {
-    if(pos >= act.maxPos)
+    if(act.actState != ACT_UNDEFINED)
     {
-      pos = act.maxPos;
-      ActSetState(ACT_MAXIMUM);
+      if(pos >= act.maxPos)
+      {
+        pos = act.maxPos;
+        ActSetState(ACT_MAXIMUM);
+      }
+      else if(pos <= act.minPos)
+      {
+        pos = act.minPos;
+        ActSetState(ACT_MINIMUM);
+      }
+      
+      if(ACT_INVERT_SERVO == 0)
+      {
+        if(pos != act.pos)
+        {
+          act.servo.write(pos);
+          act.pos = pos;
+        }
+      }
+      else  //invert servo
+      {
+        if(pos != act.pos)
+        {
+          act.servo.write(act.maxPos - pos);
+          act.pos = pos;
+        }
+      }
     }
-    else if(pos <= act.minPos)
+    else  // Act state is undefined - ignore min/max values
     {
-      pos = act.minPos;
-      ActSetState(ACT_MINIMUM);
+      if(pos != act.pos)
+        {
+          act.servo.write(pos);
+          act.pos = pos;
+        }
     }
-    
-  #ifdef ACT_INVERT_SERVO
-    if(pos != act.pos)
-    {
-      act.servo.write(pos);
-      act.pos = pos;
-    }
-  #else
-    if(pos != act.pos)
-    {
-      act.servo.write(abs(act.minPos - pos));
-      act.pos = pos;
-    }
-  #endif
 
     return ERR_NULL;
   }
 
   ErrorType ActCalibration()
   {
-
     for(int pos = act.minPos; pos <= act.maxPos; pos++)
     {
       ActSetMotorPos(pos);
@@ -125,6 +140,8 @@ ErrorType ActUpdate()
 
     ActSetMotorPos(act.minPos);
     delay(ACT_SERVO_WAIT_MS);
+
+    act.actState = ACT_HOLD;
 
     return ERR_NULL;
 

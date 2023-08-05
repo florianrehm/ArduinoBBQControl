@@ -11,9 +11,7 @@ void setup()
 
 void loop() 
 {
-  
   CtrlUpdate();
   ActUpdate();
   BtnUpdate();
-
 }

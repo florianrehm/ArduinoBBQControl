@@ -27,8 +27,7 @@ ErrorType CtrlUpdate()
     break;
     
     case  MODE_CALIBRATION: //Actuator go from min to max
-      err = ActCalibration();
-      ctrl.updateMode(MODE_HEATUP);
+      err = CtrlModeActCalibration();
     break;
 
     case MODE_CONFIG_ACT_MIN: //set target temperature, timer
@@ -144,16 +143,16 @@ ErrorType CtrlModeConfigActMax()
 
   int val = 0;
 
-      val = analogRead(CONF_WHEEL_PIN);
-      val = map(val, 0, 1023, 0, 180);
+  val = analogRead(CONF_WHEEL_PIN);
+  val = map(val, 0, 1023, 0, 180);
 
-      ActSetMotorPos(val);
+  ActSetMotorPos(val);
 
-      if(BtnPressed() == true)
-      {
-        ActSetMaxPos(val);
-        ctrl.updateMode(MODE_CONFIG_TEMP);
-      }
+  if(BtnPressed() == true)
+  {
+    ActSetMaxPos(val);
+    ctrl.updateMode(MODE_CONFIG_TEMP);
+  }
 
   if(ActGetMaxPos() < 0 || ActGetMaxPos() > 180)
   {
@@ -238,6 +237,20 @@ ErrorType CtrlModeLidOpen()
     ctrl.lidTimerInit = 0;
     ctrl.lidTimerMode = TIMER_IDLE;
     ctrl.updateMode(MODE_OPERATION);
+  }
+
+  return ERR_NULL;
+}
+
+ErrorType CtrlModeActCalibration()
+{
+  if(ActGetState() == ACT_UNDEFINED)
+  {
+    ActSetState(ACT_CALIBRATION);
+  }
+  else if(ActGetState() == ACT_HOLD)  // Calibration finished
+  {
+    ctrl.updateMode(MODE_HEATUP);
   }
 
   return ERR_NULL;

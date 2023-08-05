@@ -114,6 +114,7 @@ ErrorType CtrlModeGasLow();
 ErrorType CtrlModeFinished();
 ErrorType CtrlModeError();
 ErrorType CtrlModeOperation();
+ErrorType CtrlModeActCalibration();
 
 void CtrlSetTargetTemp(int temp);
 bool CtrlDetectOpenLid();
