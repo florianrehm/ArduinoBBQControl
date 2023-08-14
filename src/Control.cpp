@@ -177,7 +177,13 @@ ErrorType CtrlModeHeatup()
   }
   else if(TmpGetAvgTemperature() >= ctrl.targetChamberTemp)
   {
-    ctrl.updateMode(MODE_OPERATION);
+
+    /**
+    we are now at max. Temp is expected to increase. Avoid temperature increasing too fast by going from min to optimal position
+    **/
+    ActSetState(ACT_MINIMUM);
+
+    ctrl.updateMode(MODE_OPERATION);  //start normal control mode
   }
 }
 

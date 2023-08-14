@@ -7,7 +7,7 @@ LiquidCrystal lcd = LiquidCrystal(DISP_LCD_PIN_RS, DISP_LCD_PIN_EN, DISP_LCD_PIN
 const char *DispStrs[][4] = 
 {
   {"Init", "", "", "Wait"},
-  {"Calib", "", "", "Wait"},
+  {"Act Calib‚", "", "", "Wait"},
   {"Config", "OK?", "Sel. Off_L:" , ""},
   {"Config", "OK?", "Sel. Off_R:" , ""},
   {"Config", "OK?", "Sel. Temp:", ""},
