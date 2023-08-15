@@ -181,6 +181,7 @@ ErrorType CtrlModeHeatup()
     /**
     we are now at max. Temp is expected to increase. Avoid temperature increasing too fast by going from min to optimal position
     **/
+    ActSetMotorPos(ActGetMinPos());
     ActSetState(ACT_MINIMUM);
 
     ctrl.updateMode(MODE_OPERATION);  //start normal control mode
