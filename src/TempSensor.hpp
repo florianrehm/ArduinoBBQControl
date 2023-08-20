@@ -1,5 +1,7 @@
 #include <Arduino.h>
 #include "config.hpp"
+
+/*Temperature sensor data structure*/
 struct temperature_t;
 
 typedef struct temperature_t
@@ -17,6 +19,10 @@ typedef struct temperature_t
     };
 } Temperature;
 
-float TmpGetTemperature();
+/*Returns the average (normalized) temperature from the sensor*
+ *if TEMP_SIMULATION is undefined.                            *
+ *Returns value from temperature simulation wheel otherwise.  */
 int TmpGetAvgTemperature();
+
+/*Temperature init function*/
 int TmpInit();

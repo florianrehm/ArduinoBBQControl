@@ -1,9 +1,13 @@
 #include "Button.hpp"
 #include "config.hpp"
 
+/*---------Global variable declarations--------*/
+
 Button myBtn(CONF_BUTTON);
 
 bool btnPressed = false;
+
+/*---------Function implementations------------*/
 
 void BtnInit()
 {

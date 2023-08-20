@@ -4,6 +4,7 @@
 #include "Control.hpp"
 #include <LiquidCrystal.h>
 
+/*Defines the data types supported by the display*/
 enum dispDataTypes
 {
   DISP_TYPE_TARGET_TEMP,
@@ -15,6 +16,7 @@ enum dispDataTypes
   DISP_TYPE_NONE,
 };
 
+/*Display data structure*/
 struct Display_t;
 
 typedef struct Display_t
@@ -43,9 +45,13 @@ typedef struct Display_t
 
 } Display;
 
+/*Display init function*/
 int DispInit();
-void DispPrintCurrState();
+
+/*Display update loop*/
 void DispUpdate();
+
+/*Sets or updates the data buffer to be displayed on the LCD*/
 void DispSetCurrState(CtrlMode mode, int actPos, int targetTemp, ErrorType err, int chambTemp, int lidTimer);
 
 #endif

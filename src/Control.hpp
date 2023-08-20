@@ -5,7 +5,7 @@
 #include "config.hpp"
 #include <Arduino.h>
 
-
+/*Defines the control modes*/
 enum CtrlMode
 {
   MODE_INITIALIZE   = 0,
@@ -23,6 +23,7 @@ enum CtrlMode
   MODE_UNDEFINED,
 };
 
+/*Defines the configuration modes*/
 enum ConfigModeType
 {
   CONF_TEMP = 0,
@@ -32,12 +33,14 @@ enum ConfigModeType
   CONF_UNINITIALIZED = 4,
 };
 
+/*Defines the modes for timers used within control logic*/
 enum TimerMode
 {
   TIMER_IDLE,
   TIMER_RUN,
 };
 
+/*Control data strcuture*/
 struct Control_t;
 
 typedef struct Control_t
@@ -100,25 +103,10 @@ typedef struct Control_t
 
 } Control;
 
+/*Control update loop*/
 ErrorType CtrlUpdate();
+
+/*Control init function*/
 int CtrlInit();
-CtrlMode CtrlGetMode();
-
-ErrorType CtrlModeConfigTemp();
-ErrorType CtrlModeConfigActMin();
-ErrorType CtrlModeConfigActMax();
-ErrorType CtrlModePause();
-ErrorType CtrlModeHeatup();
-ErrorType CtrlModeLidOpen();
-ErrorType CtrlModeGasLow();
-ErrorType CtrlModeFinished();
-ErrorType CtrlModeError();
-ErrorType CtrlModeOperation();
-ErrorType CtrlModeActCalibration();
-
-void CtrlSetTargetTemp(int temp);
-bool CtrlDetectOpenLid();
-bool CtrlDetectGasLow();
-void updateTempHistory();
 
 #endif

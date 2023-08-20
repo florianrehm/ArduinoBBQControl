@@ -1,7 +1,7 @@
 #ifndef INCLUDE_COMMON_TYPES
 #define INCLUDE_COMMON_TYPES 1
 
-
+/*Common rrror type definition*/
 enum ErrorType
 {
   ERR_INVALID_SENSOR_DATA,

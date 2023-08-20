@@ -5,7 +5,30 @@
 #include "Display.hpp"
 #include "Button.hpp"
 
+/*---------Global variable declarations--------*/
+
 Control ctrl;
+
+/*---------Function declarations---------------*/
+
+ErrorType CtrlModeConfigTemp();
+ErrorType CtrlModeConfigActMin();
+ErrorType CtrlModeConfigActMax();
+ErrorType CtrlModePause();
+ErrorType CtrlModeHeatup();
+ErrorType CtrlModeLidOpen();
+ErrorType CtrlModeGasLow();
+ErrorType CtrlModeFinished();
+ErrorType CtrlModeError();
+ErrorType CtrlModeOperation();
+ErrorType CtrlModeActCalibration();
+void CtrlSetTargetTemp(int temp);
+bool CtrlDetectOpenLid();
+bool CtrlDetectGasLow();
+void updateTempHistory();
+CtrlMode CtrlGetMode();
+
+/*---------Function implementations------------*/
 
 int CtrlInit()
 {  
@@ -123,15 +146,15 @@ ErrorType CtrlModeConfigActMin()
 
   ActSetMotorPos(val);
 
-      if(BtnPressed() == true)
-      {
-        ActSetMinPos(val);
-        ctrl.updateMode(MODE_CONFIG_ACT_MAX);
-      }
-
-  if(ActGetMinPos() < 0 || ActGetMinPos() > 180)
+  if(BtnPressed() == true)
   {
-    err = ERR_CONFIG;
+    if(val < 0 || val > 180)
+    {
+      err = ERR_CONFIG;
+    }
+
+    ActSetMinPos(val);
+    ctrl.updateMode(MODE_CONFIG_ACT_MAX);
   }
 
   return err;
@@ -150,13 +173,13 @@ ErrorType CtrlModeConfigActMax()
 
   if(BtnPressed() == true)
   {
+    if(val < 0 || val > 180)
+    {
+      err = ERR_CONFIG;
+    }
+
     ActSetMaxPos(val);
     ctrl.updateMode(MODE_CONFIG_TEMP);
-  }
-
-  if(ActGetMaxPos() < 0 || ActGetMaxPos() > 180)
-  {
-    err = ERR_CONFIG;
   }
 
   return err;
@@ -181,8 +204,7 @@ ErrorType CtrlModeHeatup()
     /**
     we are now at max. Temp is expected to increase. Avoid temperature increasing too fast by going from min to optimal position
     **/
-    ActSetMotorPos(ActGetMinPos());
-    ActSetState(ACT_MINIMUM);
+    ActSetMotorToMinPos();
 
     ctrl.updateMode(MODE_OPERATION);  //start normal control mode
   }

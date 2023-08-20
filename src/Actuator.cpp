@@ -1,7 +1,20 @@
 #include "Actuator.hpp"
 #include <Arduino.h>
 
+
+/*---------Global variable declarations--------*/
+
 Actuator act;
+
+/*---------Function declarations---------------*/
+
+/*Moves actuator by parameter provided*/
+ErrorType ActMoveMotorStep(int step);
+
+/*Verifies calibration by moving actuator step-by-step from minimum position *  *to maximum position. Sets actuator to minimum position afterwards.          */
+ErrorType ActCalibration();
+
+/*---------Function implementations------------*/
 
 int ActInit()
 {
@@ -171,13 +184,9 @@ int ActGetCurrPos()
   return act.pos;
 }
 
-int ActGetMaxPos()
+void ActSetMotorToMinPos()
 {
-  return act.maxPos;
-}
-
-int ActGetMinPos()
-{
-  return act.minPos;
+    ActSetMotorPos(act.minPos);
+    ActSetState(ACT_MINIMUM);
 }
 

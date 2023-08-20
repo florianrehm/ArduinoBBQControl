@@ -1,7 +1,14 @@
 #include "TempSensor.hpp"
 #include <Arduino.h>
 
+/*---------Global variable declarations--------*/
 Temperature temp;
+
+/*---------Function declarations---------------*/
+
+float TmpGetTemperature();
+
+/*---------Function implementations------------*/
 
 int TmpInit()
 {
@@ -18,7 +25,7 @@ float TmpGetTemperature()
 
   tempSensorVal = map(tempSensorVal, 0, 1023, 0, 4096);
 
-  float Rt = 50 * ((4096.0/tempSensorVal) - 1);
+  float Rt = TEMP_SENSOR_RES * ((4096.0/tempSensorVal) - 1);
 
   float v = log(Rt/220.0f);
 

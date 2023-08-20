@@ -2,6 +2,7 @@
 #include <Servo.h>
 #include "config.hpp"
 
+/*Actuator states*/
 enum ActCtrlState
 {
     ACT_INCREASE,
@@ -13,6 +14,7 @@ enum ActCtrlState
     ACT_MINIMUM,
 };
 
+/*Actuator data structure*/
 struct actuator_t;
 typedef struct actuator_t
 {
@@ -39,19 +41,39 @@ typedef struct actuator_t
 
 } Actuator;
 
+/*Actuator update loop*/
 ErrorType ActUpdate();
+
+/*Actuator init function*/
 int ActInit();
+
+/*Sets actuator to pos for offset calibration *
+ *Ignores ACT_INVERT_SERVO setting            */
 ErrorType ActSetMotorPos(int pos);
-ErrorType ActMoveMotorStep(int step);
-ErrorType ActCalibration();
+
+/*Sets ActCtrlState of the actuator*/
 void ActSetState(ActCtrlState state);
+
+/*Returns ActCtrlState of the actuator*/
 ActCtrlState ActGetState();
+
+/*Sets minimum offset of the actuator   *
+ *Used within actuator caliration state *
+ *Ignores ACT_INVERT_SERVO setting      */
 void ActSetMinPos(int pos);
+
+/*Sets maximum offset of the actuator   *
+ *Used within actuator caliration state *
+*Ignores ACT_INVERT_SERVO setting       */
 void ActSetMaxPos(int pos);
 
+/*Sets actuator to minimum position     *
+ *Used within actuator caliration state *
+*Ignores ACT_INVERT_SERVO setting       */
+void ActSetMotorToMinPos();
+
+/*Returns current position of the actuator*/
 int ActGetCurrPos();
-int ActGetMinPos();
-int ActGetMaxPos();
 
 
 

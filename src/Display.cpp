@@ -1,6 +1,8 @@
 #include "Display.hpp"
 #include "config.hpp"
 
+/*---------Global variable declarations--------*/
+
 Display disp;
 LiquidCrystal lcd = LiquidCrystal(DISP_LCD_PIN_RS, DISP_LCD_PIN_EN, DISP_LCD_PIN_D4, DISP_LCD_PIN_D5, DISP_LCD_PIN_D6, DISP_LCD_PIN_D7);
 
@@ -37,7 +39,11 @@ const dispDataTypes DispVals[][4] =
   
 };
 
+/*---------Function declarations---------------*/
 
+void DispPrintCurrState();
+
+/*---------Function implementations------------*/
 
 int DispInit()
 {
