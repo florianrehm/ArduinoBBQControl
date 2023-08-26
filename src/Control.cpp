@@ -216,6 +216,7 @@ ErrorType CtrlModeHeatup()
 
     ctrl.updateMode(MODE_OPERATION);  //start normal control mode
   }
+
 }
 
 ErrorType CtrlModeOperation()
@@ -246,6 +247,13 @@ ErrorType CtrlModeOperation()
     {
       ActSetState(ACT_HOLD);
     }
+  }
+
+  //FIXME: In case of short-to-ground, display shows random values but software continues to run. Re-Initialize Display fixes the displayed data
+  if(BtnPressed() == true)
+  {
+    Serial.println("Disp Init");
+    DispInit();
   }
 
   return err;

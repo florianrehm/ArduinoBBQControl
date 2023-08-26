@@ -50,6 +50,10 @@ int TmpGetAvgTemperature()
     temp.tempBuf = temp.avgTemp;
   }
 
-  return temp.avgTemp;
+  if(temp.avgTemp < 0)
+  {
+    return 0;
+  }
 
+  return temp.avgTemp;
 }

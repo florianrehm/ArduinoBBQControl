@@ -52,7 +52,7 @@
 #define CTRL_TEMP_UPDATE_RATE 200
 
 /*Defines the wait time before reloading config in seconds*/
-#define CTRL_CONFIG_RELOAD_TIMER 20
+#define CTRL_CONFIG_RELOAD_TIMER 10
 
 /*Defines the watchdog state
   if set to 0 - watchdog disabled
