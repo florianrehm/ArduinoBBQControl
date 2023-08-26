@@ -8,29 +8,20 @@
 /*Defines the control modes*/
 enum CtrlMode
 {
-  MODE_INITIALIZE   = 0,
-  MODE_CALIBRATION  = 1,
-  MODE_CONFIG_ACT_MIN = 2,
-  MODE_CONFIG_ACT_MAX = 3,
-  MODE_CONFIG_TEMP    = 4,
-  MODE_HEATUP       = 5,
-  MODE_LID_OPEN     = 6,
-  MODE_GAS_LOW      = 7,
-  MODE_PAUSE        = 8,
-  MODE_ERROR        = 9,
-  MODE_FINISHED     = 10,
-  MODE_OPERATION    = 11,
+  MODE_INITIALIZE     = 0,
+  MODE_CALIBRATION    = 1,
+  MODE_CONFIG_RELOAD  = 2,
+  MODE_CONFIG_ACT_MIN = 3,
+  MODE_CONFIG_ACT_MAX = 4,
+  MODE_CONFIG_TEMP    = 5,
+  MODE_HEATUP         = 6,
+  MODE_LID_OPEN       = 7,
+  MODE_GAS_LOW        = 8,
+  MODE_PAUSE          = 9,
+  MODE_ERROR          = 10,
+  MODE_FINISHED       = 11,
+  MODE_OPERATION      = 12,
   MODE_UNDEFINED,
-};
-
-/*Defines the configuration modes*/
-enum ConfigModeType
-{
-  CONF_TEMP = 0,
-  CONF_ACT_MIN = 1,
-  CONF_ACT_MAX = 2,
-  CONF_DONE = 3,
-  CONF_UNINITIALIZED = 4,
 };
 
 /*Defines the modes for timers used within control logic*/
@@ -49,13 +40,11 @@ typedef struct Control_t
   CtrlMode currMode;
   int targetChamberTemp;
   int targetMeatTemp;
-
-  ConfigModeType configMode;
   
   bool lidOpen;
-  int lidTimerInit;
-  int lidTimer;
-  TimerMode lidTimerMode;
+  int ctrlTimerInit;
+  int ctrlTimer;
+  TimerMode ctrlTimerMode;
 
   int tempTimer;
   int tempTimerInit;
@@ -70,13 +59,11 @@ typedef struct Control_t
     currMode = MODE_INITIALIZE;
     targetChamberTemp = 0;
     targetMeatTemp = 0;
-
-    configMode = CONF_UNINITIALIZED;
     
     lidOpen = false;
-    lidTimer = 0;
-    lidTimerInit = 0;
-    lidTimerMode = TIMER_IDLE;
+    ctrlTimer = 0;
+    ctrlTimerInit = 0;
+    ctrlTimerMode = TIMER_IDLE;
 
     tempTimer = 0;
     tempTimerInit = 0;

@@ -179,6 +179,16 @@ void ActSetMaxPos(int pos)
   act.maxPos = pos;
 }
 
+int ActGetMinPos()
+{
+  return act.minPos;
+}
+
+int ActGetMaxPos()
+{
+  return act.maxPos;
+}
+
 int ActGetCurrPos()
 {
   return act.pos;

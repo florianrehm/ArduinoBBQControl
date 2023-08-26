@@ -10,6 +10,7 @@ const char *DispStrs[][4] =
 {
   {"Init", "", "", "Wait"},
   {"Act Calib.", "", "", "Wait"},
+  {"Config", "New?", "Reload", "T: "},
   {"Config", "OK?", "Sel. Off_L:" , ""},
   {"Config", "OK?", "Sel. Off_R:" , ""},
   {"Config", "OK?", "Sel. Temp:", ""},
@@ -26,6 +27,7 @@ const dispDataTypes DispVals[][4] =
 {
   {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_NONE},
   {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_NONE},
+  {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_TIMER},
   {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_SEL_ACT_MIN, DISP_TYPE_NONE},
   {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_SEL_ACT_MAX, DISP_TYPE_NONE},
   {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_SEL_TEMP, DISP_TYPE_NONE},
@@ -86,7 +88,7 @@ void DispUpdate()
         break;
 
         case DISP_TYPE_TIMER:
-        disp.sqVals[i] = disp.lidTimer;
+        disp.sqVals[i] = disp.timer;
         break;
 
         case DISP_TYPE_SEL_ACT_MIN:
@@ -139,12 +141,12 @@ void DispPrintCurrState()
     }
 }
 
-void DispSetCurrState(CtrlMode mode, int actPos, int targetTemp, ErrorType err, int chambTemp, int lidTimer)
+void DispSetCurrState(CtrlMode mode, int actPos, int targetTemp, ErrorType err, int chambTemp, int ctrlTimer)
 {
   disp.dispMode = mode;
   disp.targetTemp = targetTemp;
   disp.err = err;
   disp.chambTemp = chambTemp;
-  disp.lidTimer = lidTimer;
+  disp.timer = ctrlTimer;
   disp.actPos = actPos;
 }

@@ -29,11 +29,7 @@ float TmpGetTemperature()
 
   float v = log(Rt/220.0f);
 
-  float a = 0.00334519;
-  float b = 0.000243825;
-  float c = 0.00000261726;
-
-  float temperature = (1/(a + b*v + c*v*v)) - 273;
+  float temperature = (1/(TEMP_SENSOR_CHAR_A + TEMP_SENSOR_CHAR_B*v + TEMP_SENSOR_CHAR_C*v*v)) - 273;
   
 #endif
 

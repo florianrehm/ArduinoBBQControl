@@ -75,5 +75,9 @@ void ActSetMotorToMinPos();
 /*Returns current position of the actuator*/
 int ActGetCurrPos();
 
+/*Returns the minimum offset of the actuator*/
+int ActGetMinPos();
 
+/*Returns the maximum offset of the actuator*/
+int ActGetMaxPos();
 

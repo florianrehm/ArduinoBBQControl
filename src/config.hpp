@@ -45,6 +45,9 @@
 /*Defines amount of ticks for determining normalized temperature sensor value*/
 #define TMP_UPDATE_RATE 200
 
+/*Defines the wait time before reloading config in seconds*/
+#define CTRL_CONFIG_RELOAD_TIMER 20
+
 /*---------Tempsensor Config---------*/
 
 /*If defined, temperature simulation via potentionmeter will be used instead*
@@ -92,4 +95,9 @@
 #define DISP_LCD_PIN_D5 4
 #define DISP_LCD_PIN_D6 3
 #define DISP_LCD_PIN_D7 2
+
+/*---------NVM Config---------*/
+#define NVM_CONF_ADDRESS 0
+#define NVM_MAGIG_NUM 1337
+
 #endif

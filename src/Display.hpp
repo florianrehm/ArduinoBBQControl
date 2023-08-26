@@ -25,7 +25,7 @@ typedef struct Display_t
   int targetTemp;
   ErrorType err;
   int chambTemp;
-  int lidTimer;
+  int timer;
   int tick;
   int actPos;
 
@@ -38,7 +38,7 @@ typedef struct Display_t
     targetTemp = 0;
     err = ERR_NULL;
     chambTemp = 0;
-    lidTimer = 0;
+    timer = 0;
     tick = 0;
     actPos = 0;
   }
@@ -52,6 +52,6 @@ int DispInit();
 void DispUpdate();
 
 /*Sets or updates the data buffer to be displayed on the LCD*/
-void DispSetCurrState(CtrlMode mode, int actPos, int targetTemp, ErrorType err, int chambTemp, int lidTimer);
+void DispSetCurrState(CtrlMode mode, int actPos, int targetTemp, ErrorType err, int chambTemp, int ctrlTimer);
 
 #endif

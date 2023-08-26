@@ -4,13 +4,14 @@
 #include "Actuator.hpp"
 #include "Display.hpp"
 #include "Button.hpp"
+#include "NVM.hpp"
 
 /*---------Global variable declarations--------*/
 
 Control ctrl;
 
 /*---------Function declarations---------------*/
-
+ErrorType CtrlModeReloadConfig();
 ErrorType CtrlModeConfigTemp();
 ErrorType CtrlModeConfigActMin();
 ErrorType CtrlModeConfigActMax();
@@ -46,7 +47,11 @@ ErrorType CtrlUpdate()
       ActInit();
       DispInit();
       BtnInit();
-      ctrl.updateMode(MODE_CONFIG_ACT_MIN);
+      ctrl.updateMode(MODE_CONFIG_RELOAD);
+    break;
+
+    case MODE_CONFIG_RELOAD:  //Promt user whether to set new config, otherwise reload
+      err = CtrlModeReloadConfig();
     break;
     
     case  MODE_CALIBRATION: //Actuator go from min to max
@@ -99,7 +104,7 @@ ErrorType CtrlUpdate()
 
   updateTempHistory();
 
-  DispSetCurrState(ctrl.currMode, ActGetCurrPos(), ctrl.targetChamberTemp, err, TmpGetAvgTemperature(), ctrl.lidTimer);
+  DispSetCurrState(ctrl.currMode, ActGetCurrPos(), ctrl.targetChamberTemp, err, TmpGetAvgTemperature(), ctrl.ctrlTimer);
   DispUpdate();
 
   if(err != ERR_NULL)
@@ -246,25 +251,25 @@ ErrorType CtrlModeOperation()
 ErrorType CtrlModeLidOpen()
 {
   //start countdown and re-start control mode operation
-  if(ctrl.lidTimerMode == TIMER_IDLE)
+  if(ctrl.ctrlTimerMode == TIMER_IDLE)
   {
     ctrl.lidOpen = true;
-    ctrl.lidTimer = 0;
-    ctrl.lidTimerInit = millis() / 1000.0f;
-    ctrl.lidTimerMode = TIMER_RUN;
+    ctrl.ctrlTimer = 0;
+    ctrl.ctrlTimerInit = millis() / 1000.0f;
+    ctrl.ctrlTimerMode = TIMER_RUN;
     ActSetState(ACT_HOLD);
   }
-  else if(ctrl.lidTimerMode == TIMER_RUN && ctrl.lidTimer < CTRL_LIDOPEN_WAIT_SEC)
+  else if(ctrl.ctrlTimerMode == TIMER_RUN && ctrl.ctrlTimer < CTRL_LIDOPEN_WAIT_SEC)
   {
-    ctrl.lidTimer = (millis() / 1000.0f) - ctrl.lidTimerInit;
+    ctrl.ctrlTimer = (millis() / 1000.0f) - ctrl.ctrlTimerInit;
     ActSetState(ACT_HOLD);
   }
   else  //timer expired
   {
     ctrl.lidOpen = false;
-    ctrl.lidTimer = 0;
-    ctrl.lidTimerInit = 0;
-    ctrl.lidTimerMode = TIMER_IDLE;
+    ctrl.ctrlTimer = 0;
+    ctrl.ctrlTimerInit = 0;
+    ctrl.ctrlTimerMode = TIMER_IDLE;
     ctrl.updateMode(MODE_OPERATION);
   }
 
@@ -279,6 +284,12 @@ ErrorType CtrlModeActCalibration()
   }
   else if(ActGetState() == ACT_HOLD)  // Calibration finished
   {
+    NVMConfigStore conf;
+    conf.actMinPos = ActGetMinPos();
+    conf.actMaxPos = ActGetMaxPos();
+    conf.targetTemp = ctrl.targetChamberTemp;
+    NvMStoreCurrConfig(conf);
+
     ctrl.updateMode(MODE_HEATUP);
   }
 
@@ -383,6 +394,65 @@ bool CtrlDetectGasLow()
   }
 
   return gasLow;
+}
+
+ErrorType CtrlModeReloadConfig()
+{
+  ErrorType err = ERR_NULL;
+
+  if(NvMConfigIsValid() == false)
+  {
+    ctrl.updateMode(MODE_CONFIG_ACT_MIN);
+  }
+  else  // config is valid
+  {
+    if(ctrl.ctrlTimerMode == TIMER_IDLE)
+    {
+      ctrl.ctrlTimer = 0;
+      ctrl.ctrlTimerInit = millis() / 1000.0f;
+      ctrl.ctrlTimerMode = TIMER_RUN;
+    }
+    else if(ctrl.ctrlTimerMode == TIMER_RUN && ctrl.ctrlTimer <  CTRL_CONFIG_RELOAD_TIMER)  //timer running
+    {
+      ctrl.ctrlTimer = (millis() / 1000.0f) - ctrl.ctrlTimerInit;
+
+      if(BtnPressed() == true)
+      {
+        ctrl.ctrlTimerMode == TIMER_IDLE;
+        ctrl.updateMode(MODE_CONFIG_ACT_MIN);
+
+        return ERR_NULL;
+      }
+
+    }
+    else  //timer expired - reload config
+    {
+      ctrl.ctrlTimerMode = TIMER_IDLE;
+
+      NVMConfigStore conf = NvMLoadCurrConfig();
+
+      ActSetMinPos(conf.actMinPos);
+      ActSetMaxPos(conf.actMaxPos);
+      CtrlSetTargetTemp(conf.targetTemp);
+
+      if(conf.actMinPos < 0 || conf.actMinPos > 180)
+      {
+        err = ERR_CONFIG;
+      }
+
+      if(conf.actMaxPos < 0 || conf.actMaxPos > 180)
+      {
+        err = ERR_CONFIG;
+      }
+
+      if(err == ERR_NULL)
+      {
+        ctrl.updateMode(MODE_CALIBRATION);
+      }
+    }
+  }
+
+  return err;
 }
 
 CtrlMode CtrlGetMode()
