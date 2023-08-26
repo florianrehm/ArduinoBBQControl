@@ -19,6 +19,12 @@
 /*Defines tick rate for updating actuator state and position*/
 #define ACT_UPDATE_RATE 1000
 
+/*Defines the upper limit for maximum offset*/
+#define ACT_MAX_OFFSET 180
+
+/*Defines the lower limit for minimum offset*/
+#define ACT_MIN_OFFSET 0
+
 /*---------Control Config---------*/
 
 /*Defines timeout actuator is set to ACT_HOLD if open lid is detected*/
@@ -43,10 +49,15 @@
 #define CTRL_TEMP_HISTORY_TIMER 1
 
 /*Defines amount of ticks for determining normalized temperature sensor value*/
-#define TMP_UPDATE_RATE 200
+#define CTRL_TEMP_UPDATE_RATE 200
 
 /*Defines the wait time before reloading config in seconds*/
 #define CTRL_CONFIG_RELOAD_TIMER 20
+
+/*Defines the watchdog state
+  if set to 0 - watchdog disabled
+  if set to 1 - watchdog enabled*/
+#define CTRL_ENABLE_WDT 1
 
 /*---------Tempsensor Config---------*/
 

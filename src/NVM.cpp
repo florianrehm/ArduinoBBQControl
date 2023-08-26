@@ -5,6 +5,8 @@
 
 /*---------Function declarations---------------*/
 
+unsigned long NvMCalcCRConAddr(int startPos, int length);
+
 /*---------Function implementations------------*/
 
 void NvmInit()
@@ -25,8 +27,14 @@ bool NvMConfigIsValid()
 
   if(nvmConfig.magicNum == NVM_MAGIG_NUM) //TODO: Check CRC as well
   {
-    if(nvmConfig.actMinPos )
-    return true;
+    int crcpos = NVM_CONF_ADDRESS + sizeof(NvmConfigStore_t);
+    unsigned long crcRef = 0;
+    EEPROM.get(crcpos, crcRef);
+
+    if(crcRef != 0 && crcRef == NvMCalcCRConAddr(NVM_CONF_ADDRESS, sizeof(NvmConfigStore_t)))
+    {
+      return true;
+    }
   }
 
   return false;
@@ -42,9 +50,14 @@ void NvMStoreCurrConfig(NVMConfigStore nvmConfig)
 {
   nvmConfig.magicNum = NVM_MAGIG_NUM;
   EEPROM.put(NVM_CONF_ADDRESS, nvmConfig);
+
+  int crcpos = NVM_CONF_ADDRESS + sizeof(NvmConfigStore_t);
+
+  EEPROM.put(crcpos, NvMCalcCRConAddr(NVM_CONF_ADDRESS, sizeof(NvmConfigStore_t)));
 }
 
-unsigned long eeprom_crc(int startPos, int endPos) {
+unsigned long NvMCalcCRConAddr(int startPos, int length) 
+{
 
   const unsigned long crc_table[16] = {
 
@@ -58,14 +71,14 @@ unsigned long eeprom_crc(int startPos, int endPos) {
 
   };
 
-  if(endPos > EEPROM.length())
+  if(startPos + length > EEPROM.length())
   {
     return 0;
   }
 
   unsigned long crc = ~0L;
 
-  for (int index = startPos; index < endPos  ; ++index) 
+  for (int index = startPos; index < (startPos + length)  ; ++index) 
   {
 
     crc = crc_table[(crc ^ EEPROM[index]) & 0x0f] ^ (crc >> 4);

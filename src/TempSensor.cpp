@@ -40,13 +40,13 @@ int TmpGetAvgTemperature()
 {
   float currTemp = TmpGetTemperature();
 
-  temp.tick = (temp.tick + 1) % TMP_UPDATE_RATE;
+  temp.tick = (temp.tick + 1) % CTRL_TEMP_UPDATE_RATE;
 
   temp.tempBuf = temp.tempBuf + currTemp;
 
   if(temp.tick == 0)
   {
-    temp.avgTemp = (int) (temp.tempBuf / (float) TMP_UPDATE_RATE);
+    temp.avgTemp = (int) (temp.tempBuf / (float) CTRL_TEMP_UPDATE_RATE);
     temp.tempBuf = temp.avgTemp;
   }
 

@@ -114,6 +114,9 @@ ErrorType CtrlUpdate()
     Serial.print(err);
   }
 
+  //Reset watchdog
+  wdt_reset();
+
   return err;
 }
 
@@ -147,13 +150,13 @@ ErrorType CtrlModeConfigActMin()
 
   int val = 0;
   val = analogRead(CONF_WHEEL_PIN);
-  val = map(val, 0, 1023, 0, 180);
+  val = map(val, 0, 1023, ACT_MIN_OFFSET, ACT_MAX_OFFSET);
 
   ActSetMotorPos(val);
 
   if(BtnPressed() == true)
   {
-    if(val < 0 || val > 180)
+    if(val < ACT_MIN_OFFSET || val > ACT_MAX_OFFSET)
     {
       err = ERR_CONFIG;
     }
@@ -172,13 +175,13 @@ ErrorType CtrlModeConfigActMax()
   int val = 0;
 
   val = analogRead(CONF_WHEEL_PIN);
-  val = map(val, 0, 1023, 0, 180);
+  val = map(val, 0, 1023, ACT_MIN_OFFSET, ACT_MAX_OFFSET);
 
   ActSetMotorPos(val);
 
   if(BtnPressed() == true)
   {
-    if(val < 0 || val > 180)
+    if(val < ACT_MIN_OFFSET || val > ACT_MAX_OFFSET)
     {
       err = ERR_CONFIG;
     }
@@ -291,6 +294,15 @@ ErrorType CtrlModeActCalibration()
     NvMStoreCurrConfig(conf);
 
     ctrl.updateMode(MODE_HEATUP);
+
+    /*Sometimes, if there is a short-to-ground due to different grounding   *
+     *of grill and controller, the application gets stuck. Watchdog aims to *
+     *identify this issue and perform HW reset                              */
+    if(CTRL_ENABLE_WDT == 1)
+    {
+      wdt_enable(WDTO_2S);
+    }
+
   }
 
   return ERR_NULL;
@@ -435,12 +447,12 @@ ErrorType CtrlModeReloadConfig()
       ActSetMaxPos(conf.actMaxPos);
       CtrlSetTargetTemp(conf.targetTemp);
 
-      if(conf.actMinPos < 0 || conf.actMinPos > 180)
+      if(conf.actMinPos < ACT_MIN_OFFSET || conf.actMinPos > ACT_MAX_OFFSET)
       {
         err = ERR_CONFIG;
       }
 
-      if(conf.actMaxPos < 0 || conf.actMaxPos > 180)
+      if(conf.actMaxPos < ACT_MIN_OFFSET || conf.actMaxPos > ACT_MAX_OFFSET)
       {
         err = ERR_CONFIG;
       }

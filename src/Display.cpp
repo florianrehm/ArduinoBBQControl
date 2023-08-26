@@ -10,11 +10,11 @@ const char *DispStrs[][4] =
 {
   {"Init", "", "", "Wait"},
   {"Act Calib.", "", "", "Wait"},
-  {"Config", "New?", "Reload", "T: "},
+  {"Config", "New?", "Reload in ", "T: "},
   {"Config", "OK?", "Sel. Off_L:" , ""},
   {"Config", "OK?", "Sel. Off_R:" , ""},
   {"Config", "OK?", "Sel. Temp:", ""},
-  {"Heatup", "", "Act: ", "Wait"},
+  {"Heatup", "Wait", "Act:", "Tgt:"},
   {"Lid Open", "T: ", "Act:", "Tgt:"},
   {"Error", "Gas Low", "Act:", "Tgt:"},
   {"Pause", "Continue?", "", ""},
@@ -31,7 +31,7 @@ const dispDataTypes DispVals[][4] =
   {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_SEL_ACT_MIN, DISP_TYPE_NONE},
   {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_SEL_ACT_MAX, DISP_TYPE_NONE},
   {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_SEL_TEMP, DISP_TYPE_NONE},
-  {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_CHAMB_TEMP, DISP_TYPE_NONE},
+  {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_CHAMB_TEMP, DISP_TYPE_TARGET_TEMP},
   {DISP_TYPE_NONE, DISP_TYPE_TIMER, DISP_TYPE_CHAMB_TEMP, DISP_TYPE_TARGET_TEMP},
   {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_NONE},
   {DISP_TYPE_NONE, DISP_TYPE_NONE, DISP_TYPE_CHAMB_TEMP, DISP_TYPE_TARGET_TEMP},
@@ -147,6 +147,19 @@ void DispSetCurrState(CtrlMode mode, int actPos, int targetTemp, ErrorType err, 
   disp.targetTemp = targetTemp;
   disp.err = err;
   disp.chambTemp = chambTemp;
-  disp.timer = ctrlTimer;
   disp.actPos = actPos;
+
+  if(mode == MODE_LID_OPEN)
+  {
+    disp.timer = CTRL_LIDOPEN_WAIT_SEC - ctrlTimer;
+  }
+  else if(mode == MODE_CONFIG_RELOAD)
+  {
+    disp.timer = CTRL_CONFIG_RELOAD_TIMER - ctrlTimer;
+  }
+  else
+  {
+    disp.timer = ctrlTimer;
+  }
+
 }

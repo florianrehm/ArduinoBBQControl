@@ -4,6 +4,7 @@
 #include "CommonTypes.hpp"
 #include "config.hpp"
 #include <Arduino.h>
+#include <avr/wdt.h>
 
 /*Defines the control modes*/
 enum CtrlMode
