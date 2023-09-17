@@ -17,7 +17,7 @@
 #define ACT_INVERT_SERVO 0
 
 /*Defines tick rate for updating actuator state and position*/
-#define ACT_UPDATE_RATE 1000
+#define ACT_UPDATE_RATE 5000
 
 /*Defines the upper limit for maximum offset*/
 #define ACT_MAX_OFFSET 180
@@ -53,6 +53,16 @@
 
 /*Defines the wait time before reloading config in seconds*/
 #define CTRL_CONFIG_RELOAD_TIMER 10
+
+/*Defines lower range of accepted temperature deviation (under-temperature)*
+ *By setting this value to 0, the control algorithm will always aim to meet*
+  the exact temperature*/
+#define CTRL_OPERATION_TEMP_LOWER_THRESHOLD -2
+
+/*Defines upper range of accepted temperature deviation (over-temperature) *
+ *By setting this value to 0, the control algorithm will always aim to meet*
+ *the exact temperature*/
+#define CTRL_OPERATION_TEMP_UPPER_THRESHOLD 2
 
 /*Defines the watchdog state
   if set to 0 - watchdog disabled

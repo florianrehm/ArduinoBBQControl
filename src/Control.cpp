@@ -236,11 +236,13 @@ ErrorType CtrlModeOperation()
   {
     int currTemp = TmpGetAvgTemperature();
 
-    if(currTemp < ctrl.targetChamberTemp)
+    int tempDiff = currTemp - ctrl.targetChamberTemp; // Act 130 Tgt 150 -> -20
+                                                      // Act 150 Tgt 130 --> 20
+    if(tempDiff < CTRL_OPERATION_TEMP_LOWER_THRESHOLD)
     {
       ActSetState(ACT_INCREASE);
     }
-    else if(currTemp > ctrl.targetChamberTemp)
+    else if(tempDiff > CTRL_OPERATION_TEMP_UPPER_THRESHOLD)
     {
       ActSetState(ACT_DECREASE);
     }
