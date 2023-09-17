@@ -28,6 +28,7 @@ bool CtrlDetectOpenLid();
 bool CtrlDetectGasLow();
 void updateTempHistory();
 CtrlMode CtrlGetMode();
+void CtrlClearTempHistory();
 
 /*---------Function implementations------------*/
 
@@ -282,6 +283,8 @@ ErrorType CtrlModeLidOpen()
     ctrl.ctrlTimerInit = 0;
     ctrl.ctrlTimerMode = TIMER_IDLE;
     ctrl.updateMode(MODE_OPERATION);
+
+    CtrlClearTempHistory(); //collect new temp history to avoid starting timer again after expired due to temp. difference
   }
 
   return ERR_NULL;
@@ -478,4 +481,10 @@ ErrorType CtrlModeReloadConfig()
 CtrlMode CtrlGetMode()
 {
   return ctrl.currMode;
+}
+
+void CtrlClearTempHistory()
+{
+  ctrl.tempHistoryCount = 0;
+  ctrl.tempHistoryBufOverflow = false;
 }
